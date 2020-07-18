@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  golang:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile_dev
+    entrypoint: tail -f /dev/null
+    volumes:
+    - ../:/go/projects/createDashButton

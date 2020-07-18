@@ -1,0 +1,43 @@
+FROM golang:1.14
+
+# Ignore APT warnings about not having a TTY
+ENV DEBIAN_FRONTEND noninteractive
+
+ENV GOPATH=/go
+ENV GOBIN=/go/bin
+
+# install build essentials
+RUN apt-get update && \
+    apt-get install -y wget build-essential pkg-config --no-install-recommends
+
+# Install ImageMagick deps
+RUN apt-get -q -y install libjpeg-dev libpng-dev libtiff-dev libfreetype6-dev \
+    libgif-dev libx11-dev --no-install-recommends
+
+# update font cache
+RUN apt install gsfonts locate
+RUN /usr/bin/updatedb
+
+ENV IMAGEMAGICK_VERSION=6.9.10-11
+
+RUN cd && \
+	wget https://github.com/ImageMagick/ImageMagick6/archive/${IMAGEMAGICK_VERSION}.tar.gz && \
+	tar xvzf ${IMAGEMAGICK_VERSION}.tar.gz && \
+	cd ImageMagick* && \
+	./configure \
+	    --without-magick-plus-plus \
+	    --without-perl \
+	    --disable-openmp \
+	    --with-gvc=no \
+	    --disable-docs \
+	    --with-gslib \
+	    --with-freetype=yes && \
+	make -j$(nproc) && make install && \
+	ldconfig /usr/local/lib
+
+RUN wget http://www.imagemagick.org/Usage/scripts/imagick_type_gen
+RUN perl imagick_type_gen > type.xml
+RUN cp type.xml /usr/local/etc/ImageMagick-6/type.xml
+
+WORKDIR /go/projects/createDashButton
+

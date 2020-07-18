@@ -94,7 +94,4 @@ fabric.properties
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
-Docker/
-Fonts/
-createDashBoardButton
-createDashBoardButton.go
+
